@@ -11,6 +11,7 @@ document.getElementById('clean-cart').addEventListener('click', ev => {
 
 cart.divTotal = document.getElementById('cart-price');
 cart.divQuatity = document.getElementById('cart-quatity');
+cart.productList('lista-produtos');
 cart.searchProducts('produtos').then(() => {
     vitrine.innerHTML = null;
     cart.products.forEach(product => {
@@ -32,38 +33,22 @@ cart.searchProducts('produtos').then(() => {
         const viewQuantity = templateProduct.querySelector('.view-quantity');
         viewQuantity.classList.add(id);
         const btnAddToCart = templateProduct.querySelector('.add-to-cart');
+        const removeProduct = templateProduct.querySelector('.remove-product');
+        removeProduct.setAttribute('data-id', product._id ?? product.id);
 
         viewQuantity.value = localStorage.getItem(id) ?? 0;
-        disableButtonForEmptyQuantity(viewQuantity.value, btnAddToCart);
+        disableButtonForEmptyQuantity(btnAddToCart, viewQuantity.value, id, product.id, removeProduct);
 
         btnIncreaseQuantity.addEventListener('click', ev => {
             viewQuantity.value++;
-            disableButtonForEmptyQuantity(viewQuantity.value, btnAddToCart);
-            localStorage.setItem(id, viewQuantity.value);
-            let prod = cart.cart.find(product => product.id == ev.currentTarget.dataset.id);
-            let prodIndex = cart.cart.findIndex(product => product.id == ev.currentTarget.dataset.id);
-            if (prod && viewQuantity.value > 0) {
-                cart.add(parseInt(viewQuantity.value), JSON.stringify(prod));
-            } else {
-                cart.cart.splice(prodIndex, 1);
-                localStorage.removeItem(id);
-            }
+            disableButtonForEmptyQuantity(btnAddToCart, viewQuantity.value, id, ev.currentTarget.dataset.id, removeProduct);
         });
 
         btnDecreaseQuantity.addEventListener('click', ev => {
             if (viewQuantity.value > 0) {
                 viewQuantity.value--;
             }
-            disableButtonForEmptyQuantity(viewQuantity.value, btnAddToCart);
-            localStorage.setItem(id, viewQuantity.value);
-            let prod = cart.cart.find(product => product.id == ev.currentTarget.dataset.id);
-            let prodIndex = cart.cart.findIndex(product => product.id == ev.currentTarget.dataset.id);
-            if (prod && viewQuantity.value > 0) {
-                cart.add(parseInt(viewQuantity.value), JSON.stringify(prod));
-            } else {
-                cart.cart.splice(prodIndex, 1);
-                localStorage.removeItem(id);
-            }
+            disableButtonForEmptyQuantity(btnAddToCart, viewQuantity.value, id, ev.currentTarget.dataset.id, removeProduct);
         });
 
         btnAddToCart.setAttribute('data-product', JSON.stringify(product));
@@ -71,6 +56,13 @@ cart.searchProducts('produtos').then(() => {
             cart.add(ev.currentTarget.getAttribute('data-quantity'), ev.currentTarget.getAttribute('data-product'));
             btnLimpar();
         });
+
+        removeProduct.addEventListener('click', ev => {
+            viewQuantity.value = 0;
+            cart.removeItem(ev.currentTarget.dataset.id, () => {
+                disableButtonForEmptyQuantity(btnAddToCart, 0, id, ev.currentTarget.dataset.id, removeProduct)
+            });
+        })
 
         templateProduct.childNodes.forEach(node => {
             if (node.nodeType === Node.ELEMENT_NODE) {
@@ -84,6 +76,8 @@ cart.searchProducts('produtos').then(() => {
     cart.loadCart(btnLimpar);
 });
 
+
+
 function btnLimpar() {
     if (cart.cart.length) {
         liLimpar.classList.remove('d-none');
@@ -92,11 +86,19 @@ function btnLimpar() {
     }
 }
 
-function disableButtonForEmptyQuantity(quantity, btn) {
+function disableButtonForEmptyQuantity(btn, quantity, id, produtoId, removeProduct = null) {
+    localStorage.setItem(id, quantity);
+    let prod = cart.cart.find(product => parseInt(product.id) === parseInt(produtoId));
+    if (prod) {
+        prod.quantidade = quantity;
+        cart.update(prod);
+    }
     btn.setAttribute('data-quantity', quantity);
     if (quantity >= 1) {
         btn.removeAttribute('disabled');
+        removeProduct?.classList.remove('d-none');
         return;
     }
     btn.setAttribute('disabled', 'disabled');
+    removeProduct?.classList.add('d-none');
 }

@@ -34,7 +34,7 @@
                        aria-expanded="false">
                         <i class="bi bi-cart"></i> <span id="cart-quatity">0</span> / <span id="cart-price">0</span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
+                    <ul class="dropdown-menu dropdown-menu-end" id="lista-produtos">
                         <li><a class="dropdown-item disabled" aria-disabled="true">Não há produtos</a></li>
                     </ul>
                 </li>
@@ -58,7 +58,7 @@
     </section>
     <template id="template-produto">
         <div class="col-md-3">
-            <div class="card" style="width: 18rem;">
+            <div class="card mb-2">
                 <img src="..." class="card-img-top" alt="..." loading="lazy">
                 <div class="card-body">
                     <h5 class="card-title">Card title</h5>
@@ -80,6 +80,7 @@
                     </button>
                 </div>
             </div>
+            <button class="btn btn-sm btn-outline-danger remove-product d-none"><i class="bi bi-cart-x"></i> Remover</button>
         </div>
     </template>
 </main>
