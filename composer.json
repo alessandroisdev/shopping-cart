@@ -1,0 +1,21 @@
+{
+  "name": "alessandroisdev/shopping-cart",
+  "autoload": {
+    "psr-4": {
+      "AlessandroIsDev\\ShoppingCart\\": "src/"
+    },
+    "files": [
+      "helpers/api.php"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Alessandro P Souza",
+      "email": "alessandro-design@hotmail.com"
+    }
+  ],
+  "require-dev": {
+    "fakerphp/faker": "1.23.1",
+    "rakibtg/sleekdb": "^2.15"
+  }
+}
